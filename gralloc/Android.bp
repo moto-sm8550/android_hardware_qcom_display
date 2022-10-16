@@ -11,7 +11,6 @@ cc_library_shared {
         "display_headers",
         "qti_kernel_headers",
         "qti_display_kernel_headers",
-        "device_kernel_headers",
     ],
     shared_libs: [
         "libdl",
@@ -49,7 +48,6 @@ cc_library_shared {
         "display_headers",
         "qti_kernel_headers",
         "qti_display_kernel_headers",
-        "device_kernel_headers",
         "libvmmem_headers",
     ],
     include_dirs: [

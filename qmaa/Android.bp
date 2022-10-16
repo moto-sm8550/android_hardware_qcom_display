@@ -1,7 +1,7 @@
 soong_namespace {
     imports: [
-        "hardware/qcom-caf/sm8350/display",
-        "hardware/qcom-caf/sm8350/display/libdebug",
+        "hardware/qcom-caf/sm8550/display",
+        "hardware/qcom-caf/sm8550/display/libdebug",
     ],
 }
 
@@ -20,7 +20,6 @@ cc_binary {
         "display_headers",
         "qti_kernel_headers",
         "qti_display_kernel_headers",
-        "device_kernel_headers",
     ],
 
     cflags: [
@@ -53,4 +52,3 @@ cc_binary {
     init_rc: ["vendor.qti.hardware.display.composer-service.rc"],
     vintf_fragments: ["vendor.qti.hardware.display.composer-service.xml"],
 }
-
