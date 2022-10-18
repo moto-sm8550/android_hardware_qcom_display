@@ -87,6 +87,7 @@ cc_library_shared {
     vendor: true,
     cflags: [
         "-Wno-sign-conversion",
+        "-Wno-unused-variable",
         "-DLOG_TAG=\"qtigralloc\"",
         "-D__QTI_DISPLAY_GRALLOC__",
     ],
