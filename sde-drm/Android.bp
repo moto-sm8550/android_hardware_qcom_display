@@ -22,6 +22,7 @@ cc_library_shared {
         "-Werror",
         "-fno-operator-names",
         "-Wno-unused-parameter",
+        "-Wno-format",
         "-DLOG_TAG=\"SDE_DRM\"",
     ],
     clang: true,
