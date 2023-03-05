@@ -68,9 +68,9 @@ DisplayError HWInterface::Create(int32_t display_id, DisplayType type,
   if (error != kErrorNone) {
     delete hw;
     if (kErrorDeviceRemoved == error) {
-      DLOGW("Init on HWInterface for display %d-%d aborted.", display_id, type);
+      DLOGW("Init on HWInterface for display %lu-%lu aborted.", display_id, type);
     } else {
-      DLOGE("Init on HWInterface for display %d-%d failed.", display_id, type);
+      DLOGE("Init on HWInterface for display %lu-%lu failed.", display_id, type);
     }
     return error;
   }

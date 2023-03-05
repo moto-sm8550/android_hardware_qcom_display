@@ -49,7 +49,7 @@ static bool GetConnector(int dev_fd, drmModeRes *res, drmModeConnector **connect
     if (conn && conn->connector_type == DRM_MODE_CONNECTOR_DSI && conn->count_modes &&
         conn->connection == DRM_MODE_CONNECTED) {
       *connector = conn;
-      DRM_LOGI("Found connector %d", conn->connector_id);
+      DRM_LOGI("Found connector %lu", conn->connector_id);
       return true;
     }
   }
@@ -62,7 +62,7 @@ static bool GetEncoder(int dev_fd, drmModeConnector *conn, drmModeEncoder **enco
     drmModeEncoder *enc = drmModeGetEncoder(dev_fd, conn->encoders[i]);
     if (enc && enc->encoder_type == DRM_MODE_ENCODER_DSI) {
       *encoder = enc;
-      DRM_LOGI("Found encoder %d", enc->encoder_id);
+      DRM_LOGI("Found encoder %lu", enc->encoder_id);
       return true;
     }
   }
@@ -75,7 +75,7 @@ static bool GetCrtc(int dev_fd, drmModeRes *res, drmModeEncoder *enc, drmModeCrt
       drmModeCrtc *c = drmModeGetCrtc(dev_fd, res->crtcs[i]);
       if (c) {
         *crtc = c;
-        DRM_LOGI("Found crtc %d", c->crtc_id);
+        DRM_LOGI("Found crtc %lu", c->crtc_id);
         return true;
       }
     }

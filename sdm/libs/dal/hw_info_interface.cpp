@@ -75,7 +75,7 @@ DisplayError HWInfoInterface::Create(HWInfoInterface **intf) {
 
 DisplayError HWInfoInterface::Destroy(HWInfoInterface *intf) {
   ref_count_ = ref_count_ - 1 >= 0 ? --ref_count_ : 0;
-  DLOGV("refcount: %d", ref_count_);
+  DLOGV("refcount: %lu", ref_count_);
 
   if (!ref_count_ && intf) {
     delete intf;

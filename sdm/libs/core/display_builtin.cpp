@@ -2817,7 +2817,7 @@ void DisplayIPCVmCallbackImpl::ExportHFCBuffer() {
   export_buf_in_params->panel_id = panel_id_;
   export_buf_in_params->mem_handle = buffer_info_hfc_.alloc_buffer_info.mem_handle;
 
-  DLOGI("Allocated hfc buffer mem_handle %d size %d panel id :%x", export_buf_in_params->mem_handle,
+  DLOGI("Allocated hfc buffer mem_handle %d size %d panel id :%lx", export_buf_in_params->mem_handle,
         export_buf_in_params->size, export_buf_in_params->panel_id);
   if ((ret = ipc_intf_->SetParameter(kIpcParamSetHFCBuffer, in))) {
     DLOGE("Failed to export demura buffers, error = %d", ret);

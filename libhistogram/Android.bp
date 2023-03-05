@@ -35,6 +35,7 @@ cc_library_shared {
         "-Wall",
         "-std=c++14",
         "-Werror",
+        "-Wno-format",
         "-fno-operator-names",
         "-Wthread-safety",
     ],

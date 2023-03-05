@@ -33,7 +33,7 @@
 #include <bitset>
 
 #define DLOG(method, format, ...) \
-  display::DebugHandler::Get()->method(__CLASS__ "::%s: " format, __FUNCTION__, ##__VA_ARGS__)
+  display::DebugHandler::Get()->method(__CLASS__ "::%lu: " format, __FUNCTION__, ##__VA_ARGS__)
 
 #define DLOG_IF(tag, method, format, ...) \
   if (display::DebugHandler::GetLogMask()[tag]) { \

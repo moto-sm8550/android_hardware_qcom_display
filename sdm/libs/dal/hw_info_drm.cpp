@@ -287,20 +287,20 @@ DisplayError HWInfoDRM::GetHWResourceInfo(HWResourceInfo *hw_resource) {
     hw_resource->hw_dest_scalar_info.count = 0;
   }
 
-  DLOGI("Destination scaler %sfound. Block count = %d.", hw_resource->hw_dest_scalar_info.count ?
+  DLOGI("Destination scaler %sfound. Block count = %lu.", hw_resource->hw_dest_scalar_info.count ?
         "": "disabled or not ", hw_resource->hw_dest_scalar_info.count);
-  DLOGI("Max plane width = %d", hw_resource->max_pipe_width);
-  DLOGI("Max cursor width = %d", hw_resource->max_cursor_size);
-  DLOGI("Max plane upscale = %d", hw_resource->max_scale_up);
-  DLOGI("Max plane downscale = %d", hw_resource->max_scale_down);
-  DLOGI("Has Decimation = %d", hw_resource->has_decimation);
-  DLOGI("Max Blending Stages = %d", hw_resource->num_blending_stages);
-  DLOGI("Has Source Split = %d", hw_resource->is_src_split);
-  DLOGI("Has QSEED3 = %d", hw_resource->has_qseed3);
-  DLOGI("Has UBWC = %d", hw_resource->has_ubwc);
-  DLOGI("Has Micro Idle = %d", hw_resource->has_micro_idle);
-  DLOGI("Has Noise Layer = %d", hw_resource->has_noise_layer);
-  DLOGI("Has Concurrent Writeback = %d", hw_resource->has_concurrent_writeback);
+  DLOGI("Max plane width = %lu", hw_resource->max_pipe_width);
+  DLOGI("Max cursor width = %lu", hw_resource->max_cursor_size);
+  DLOGI("Max plane upscale = %lu", hw_resource->max_scale_up);
+  DLOGI("Max plane downscale = %lu", hw_resource->max_scale_down);
+  DLOGI("Has Decimation = %lu", hw_resource->has_decimation);
+  DLOGI("Max Blending Stages = %lu", hw_resource->num_blending_stages);
+  DLOGI("Has Source Split = %lu", hw_resource->is_src_split);
+  DLOGI("Has QSEED3 = %lu", hw_resource->has_qseed3);
+  DLOGI("Has UBWC = %lu", hw_resource->has_ubwc);
+  DLOGI("Has Micro Idle = %lu", hw_resource->has_micro_idle);
+  DLOGI("Has Noise Layer = %lu", hw_resource->has_noise_layer);
+  DLOGI("Has Concurrent Writeback = %lu", hw_resource->has_concurrent_writeback);
   string tap_points = "Tap Points: ";
   for (CwbTapPoint &tap_point : hw_resource->tap_points) {
     tap_points += std::to_string(tap_point) + " ";

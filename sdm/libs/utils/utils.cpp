@@ -112,7 +112,7 @@ void SetRealTimePriority() {
   struct sched_param param = {0};
   param.sched_priority = 2;
   if (sched_setscheduler(0, SCHED_FIFO | SCHED_RESET_ON_FORK, &param) != 0) {
-    DLOGW("Couldn't set SCHED_FIFO: %d", errno);
+    DLOGW("Couldn't set SCHED_FIFO: %lu", errno);
   }
 }
 
@@ -177,13 +177,13 @@ void ApplyCwbRoiRestrictions(LayerRect &roi, const LayerRect &cwb_full_frame,
   }
 
   if (!expand_height) {
-    DLOGV_IF(kTagNone, "Expanding ROI width to %u ", roi_width + width_to_expand);
+    DLOGV_IF(kTagNone, "Expanding ROI width to %lu ", roi_width + width_to_expand);
     int roi_left = INT(roi.left), roi_right = INT(roi.right);
     AdjustSize(roi_width + width_to_expand, 0, INT(cwb_full_frame.right), &roi_left, &roi_right);
     roi.left = FLOAT(roi_left);
     roi.right = FLOAT(roi_right);
   } else {
-    DLOGV_IF(kTagNone, "Expanding ROI height to %u ", roi_height + height_to_expand);
+    DLOGV_IF(kTagNone, "Expanding ROI height to %lu ", roi_height + height_to_expand);
     int roi_top = INT(roi.top), roi_bottom = INT(roi.bottom);
     AdjustSize(roi_height + height_to_expand, 0, INT(cwb_full_frame.bottom), &roi_top, &roi_bottom);
     roi.top = FLOAT(roi_top);

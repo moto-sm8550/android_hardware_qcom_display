@@ -438,10 +438,10 @@ class DisplayEventHandler {
   virtual void MMRMEvent(bool restricted) = 0;
 
   /*! @brief Event handler for sending status of Qsync */
-  virtual DisplayError HandleQsyncState(const QsyncEventData &event_data) { return kErrorNone; }
+  virtual DisplayError HandleQsyncState([[maybe_unused]] const QsyncEventData &event_data) { return kErrorNone; }
 
   /*! @brief Event handler to notify CWB Done */
-  virtual void NotifyCwbDone(int32_t status, const LayerBuffer& buffer) { }
+  virtual void NotifyCwbDone([[maybe_unused]] int32_t status, [[maybe_unused]] const LayerBuffer& buffer) {}
 
  protected:
   virtual ~DisplayEventHandler() { }

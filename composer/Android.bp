@@ -18,6 +18,7 @@ cc_binary {
     cflags: [
         "-Wno-missing-field-initializers",
         "-Wno-unused-parameter",
+        "-Wno-format",
         "-DLOG_TAG=\"SDM\"",
     ],
     clang: true,

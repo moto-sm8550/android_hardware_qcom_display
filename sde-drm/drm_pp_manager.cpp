@@ -317,7 +317,7 @@ int DRMPPManager::SetPPRangeProperty(drmModeAtomicReq *req, uint32_t obj_id,
   value = *((uint64_t *)feature.payload);
   ret = drmModeAtomicAddProperty(req, obj_id, prop_info->prop_id, value);
   if (ret < 0) {
-    DRM_LOGE("failed to add property ret %d id %d value %llu", ret, prop_info->prop_id, value);
+    DRM_LOGE("failed to add property ret %d id %d value %lu", ret, prop_info->prop_id, value);
   } else {
     ret = 0;
   }
