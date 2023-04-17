@@ -30,7 +30,7 @@
 /*
  * Changes from Qualcomm Innovation Center are provided under the following license:
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
@@ -80,8 +80,10 @@ class DisplayNull : public DisplayInterface {
   virtual void ScreenRefresh() { }
   virtual bool IsWriteBackSupportedFormat(const LayerBufferFormat &format) { return false; }
   virtual bool HandleCwbTeardown() { return false; }
-  virtual void Abort() {};
+  virtual void Abort() {}
   virtual uint32_t GetAvailableMixerCount() { return 0; }
+  virtual DisplayError GetDisplayId(int32_t *display_id);
+  virtual DisplayError GetDisplayType(DisplayType *display_type);
 
   MAKE_NO_OP(CommitOrPrepare(LayerStack *))
   MAKE_NO_OP(PrePrepare(LayerStack *))
@@ -122,8 +124,6 @@ class DisplayNull : public DisplayInterface {
   MAKE_NO_OP(SetMixerResolution(uint32_t, uint32_t))
   MAKE_NO_OP(SetDetailEnhancerData(const DisplayDetailEnhancerData &))
   MAKE_NO_OP(GetDisplayPort(DisplayPort *))
-  MAKE_NO_OP(GetDisplayId(int32_t *))
-  MAKE_NO_OP(GetDisplayType(DisplayType *))
   MAKE_NO_OP(SetCompositionState(LayerComposition, bool))
   MAKE_NO_OP(GetClientTargetSupport(uint32_t, uint32_t, LayerBufferFormat,
                                     const ColorMetaData &))
@@ -178,25 +178,6 @@ class DisplayNull : public DisplayInterface {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xD1
   };
-};
-
-class DisplayNullExternal : public DisplayNull {
- public:
-  virtual DisplayError Commit(LayerStack *layer_stack);
-  virtual DisplayError GetDisplayState(DisplayState *state);
-  virtual DisplayError SetDisplayState(DisplayState state, bool teardown,
-                                       shared_ptr<Fence> *release_fence);
-  virtual DisplayError SetFrameBufferConfig(const DisplayConfigVariableInfo &variable_info);
-  virtual DisplayError GetFrameBufferConfig(DisplayConfigVariableInfo *variable_info);
-  virtual DisplayError GetDisplayIdentificationData(uint8_t *out_port, uint32_t *out_data_size,
-                                                    uint8_t *out_data);
-  void SetActive(bool active) { active_ = active; }
-  bool IsActive() { return active_; }
-
- private:
-  bool active_ = false;
-  DisplayState state_ = kStateOff;
-  DisplayConfigVariableInfo fb_config_ = {};
 };
 
 }  // namespace sdm

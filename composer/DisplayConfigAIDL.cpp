@@ -1,6 +1,30 @@
 /*
 * Copyright (c) 2021 The Linux Foundation. All rights reserved.
 *
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are
+* met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above
+*       copyright notice, this list of conditions and the following
+*       disclaimer in the documentation and/or other materials provided
+*       with the distribution.
+*     * Neither the name of The Linux Foundation nor the names of its
+*       contributors may be used to endorse or promote products derived
+*       from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+* ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+* BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+* OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+* IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
@@ -74,17 +98,6 @@ sdm::HWCDisplay::DisplayStatus MapExternalStatus(ExternalStatus status) {
   }
 
   return sdm::HWCDisplay::kDisplayStatusInvalid;
-}
-
-int DisplayConfigAIDL::IsPowerModeOverrideSupported(uint32_t disp_id, bool *supported) {
-  if (!hwc_session_->async_powermode_ || (disp_id > sdm::HWCCallbacks::kNumRealDisplays)) {
-    ALOGW("%s: Power mode override is not supported on display:%d", __FUNCTION__, disp_id);
-    *supported = false;
-  } else {
-    *supported = true;
-  }
-
-  return 0;
 }
 
 bool WaitForResourceNeeded(HWC2::PowerMode prev_mode, HWC2::PowerMode new_mode) {
@@ -356,81 +369,12 @@ ScopedAStatus DisplayConfigAIDL::updateVSyncSourceOnPowerModeDoze() {
 }
 
 ScopedAStatus DisplayConfigAIDL::setPowerMode(int dispId, PowerMode powerMode) {
-  SCOPE_LOCK(hwc_session_->display_config_locker_);
-
-  bool supported = false;
-  IsPowerModeOverrideSupported(dispId, &supported);
-  if (!supported) {
-    ALOGW("%s: Set power mode:%d on display:%d is not supported", __FUNCTION__, powerMode, dispId);
-    return ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
-  }
-
-  // Active builtin display needs revalidation
-  hwc2_display_t active_builtin_disp_id = hwc_session_->GetActiveBuiltinDisplay();
-  HWC2::PowerMode previous_mode = hwc_session_->hwc_display_[dispId]->GetCurrentPowerMode();
-
-  ALOGI("%s: disp_id: %d power_mode: %d", __FUNCTION__, dispId, powerMode);
-  sdm::HWCDisplay::HWCLayerStack stack = {};
-  hwc2_display_t dummy_disp_id = hwc_session_->map_hwc_display_.at(dispId);
-
-  // Power state transition start.
-  // Acquire the display's power-state transition var read lock.
-  hwc_session_->power_state_[dispId].Lock();
-  hwc_session_->power_state_transition_[dispId] = true;
-  hwc_session_->locker_[dispId].Lock();        // Lock the real display.
-  hwc_session_->locker_[dummy_disp_id].Lock();  // Lock the corresponding dummy display.
-
-  // Place the real display's layer-stack on the dummy display.
-  hwc_session_->hwc_display_[dispId]->GetLayerStack(&stack);
-  hwc_session_->hwc_display_[dummy_disp_id]->SetLayerStack(&stack);
-  hwc_session_->hwc_display_[dummy_disp_id]->UpdatePowerMode(
-                                       hwc_session_->hwc_display_[dispId]->GetCurrentPowerMode());
-
-  hwc_session_->locker_[dummy_disp_id].Unlock();  // Release the dummy display.
-  // Release the display's power-state transition var read lock.
-  hwc_session_->power_state_[dispId].Unlock();
-
-  // From now, till power-state transition ends, for operations that need to be non-blocking, do
-  // those operations on the dummy display.
-
-  // Perform the actual [synchronous] power-state change.
-  hwc_session_->hwc_display_[dispId]->SetPowerMode(static_cast<HWC2::PowerMode>(powerMode),
-                                                    false /* teardown */);
-
-  // Power state transition end.
-  // Acquire the display's power-state transition var read lock.
-  hwc_session_->power_state_[dispId].Lock();
-  hwc_session_->power_state_transition_[dispId] = false;
-  hwc_session_->locker_[dummy_disp_id].Lock();  // Lock the dummy display.
-
-  // Retrieve the real display's layer-stack from the dummy display.
-  hwc_session_->hwc_display_[dummy_disp_id]->GetLayerStack(&stack);
-  hwc_session_->hwc_display_[dispId]->SetLayerStack(&stack);
-  // Read display has got layerstack. Update the fences.
-  hwc_session_->hwc_display_[dispId]->PostPowerMode();
-
-  hwc_session_->locker_[dummy_disp_id].Unlock();  // Release the dummy display.
- hwc_session_->locker_[dispId].Unlock();        // Release the real display.
-  // Release the display's power-state transition var read lock.
-  hwc_session_->power_state_[dispId].Unlock();
-
-  HWC2::PowerMode new_mode = hwc_session_->hwc_display_[dispId]->GetCurrentPowerMode();
-  if (active_builtin_disp_id < sdm::HWCCallbacks::kNumRealDisplays &&
-      hwc_session_->hwc_display_[dispId]->IsFirstCommitDone() &&
-      WaitForResourceNeeded(previous_mode, new_mode)) {
-    hwc_session_->WaitForResources(true, active_builtin_disp_id, dispId);
-  }
-
-  return ScopedAStatus::ok();
+  // This API is deprecated
+  return ScopedAStatus(AStatus_fromExceptionCode(EX_UNSUPPORTED_OPERATION));
 }
 
 ScopedAStatus DisplayConfigAIDL::isPowerModeOverrideSupported(int dispId, bool* supported) {
-  if (!hwc_session_->async_powermode_ || (dispId > sdm::HWCCallbacks::kNumRealDisplays)) {
-    *supported = false;
-  } else {
-    *supported = true;
-  }
-
+  *supported = false;
   return ScopedAStatus::ok();
 }
 

@@ -4,8 +4,6 @@
  *
  * Copyright 2015 The Android Open Source Project
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -491,26 +489,15 @@ HWCDisplay::HWCDisplay(CoreInterface *core_intf, BufferAllocator *buffer_allocat
 int HWCDisplay::Init() {
   DisplayError error = kErrorNone;
 
-  HWCDebugHandler::Get()->GetProperty(ENABLE_NULL_DISPLAY_PROP, &null_display_mode_);
-  HWCDebugHandler::Get()->GetProperty(ENABLE_ASYNC_POWERMODE, &async_power_mode_);
-
-  if (null_display_mode_) {
-    DisplayNull *disp_null = new DisplayNull();
-    disp_null->Init();
-    layer_stack_.flags.use_metadata_refresh_rate = false;
-    display_intf_ = disp_null;
-    DLOGI("Enabling null display mode for display type %d", type_);
-  } else {
-    error = core_intf_->CreateDisplay(sdm_id_, this, &display_intf_);
-    if (error != kErrorNone) {
-      if (kErrorDeviceRemoved == error) {
-        DLOGW("Display creation cancelled. Display %d-%d removed.", sdm_id_, type_);
-        return -ENODEV;
-      } else {
-        DLOGE("Display create failed. Error = %d display_id = %d event_handler = %p disp_intf = %p",
-              error, sdm_id_, this, &display_intf_);
-        return -EINVAL;
-      }
+  error = core_intf_->CreateDisplay(sdm_id_, this, &display_intf_);
+  if (error != kErrorNone) {
+    if (kErrorDeviceRemoved == error) {
+      DLOGW("Display creation cancelled. Display %d-%d removed.", sdm_id_, type_);
+      return -ENODEV;
+    } else {
+      DLOGE("Display create failed. Error = %d display_id = %d event_handler = %p disp_intf = %p",
+            error, sdm_id_, this, display_intf_);
+      return -EINVAL;
     }
   }
 
@@ -602,15 +589,10 @@ void HWCDisplay::UpdateConfigs() {
 }
 
 int HWCDisplay::Deinit() {
-  if (null_display_mode_) {
-    delete static_cast<DisplayNull *>(display_intf_);
-    display_intf_ = nullptr;
-  } else {
-    DisplayError error = core_intf_->DestroyDisplay(display_intf_);
-    if (error != kErrorNone) {
-      DLOGE("Display destroy failed. Error = %d", error);
-      return -EINVAL;
-    }
+  DisplayError error = core_intf_->DestroyDisplay(display_intf_);
+  if (error != kErrorNone) {
+    DLOGE("Display destroy failed. Error = %d", error);
+    return -EINVAL;
   }
 
   delete client_target_;
@@ -1032,10 +1014,8 @@ HWC2::Error HWCDisplay::SetPowerMode(HWC2::PowerMode mode, bool teardown) {
   release_fence_ = release_fence;
   current_power_mode_ = mode;
 
-  // Close the release fences in synchronous power updates
-  if (!async_power_mode_) {
-    PostPowerMode();
-  }
+  PostPowerMode();
+
   return HWC2::Error::None;
 }
 
@@ -1219,6 +1199,16 @@ HWC2::Error HWCDisplay::GetPerFrameMetadataKeys(uint32_t *out_num_keys,
       out_keys[i] = static_cast<PerFrameMetadataKey>(i);
     }
   }
+  return HWC2::Error::None;
+}
+
+HWC2::Error HWCDisplay::SetDisplayAnimating(bool animating) {
+  // Trigger refresh, when animation ends.
+  if (!animating) {
+    callbacks_->Refresh(id_);
+  }
+
+  animating_ = animating;
   return HWC2::Error::None;
 }
 
@@ -3088,7 +3078,11 @@ DisplayError HWCDisplay::HandleSecureEvent(SecureEvent secure_event, bool *needs
   }
 
   if (update_event_only) {
-    secure_event_ = secure_event;
+    if (secure_event == kTUITransitionPrepare) {
+      secure_event_ = kTUITransitionPrepare;
+    } else {
+      secure_event_ = kSecureEventMax;
+    }
     return kErrorNone;
   }
 

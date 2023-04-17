@@ -117,7 +117,6 @@
 // Disable 3d tonemap support for UI layers
 #define DISABLE_UI_3D_TONEMAP                DISPLAY_PROP("disable_ui_3d_tonemap")
 #define QDCM_DISABLE_FACTORY_MODE_PROP       DISPLAY_PROP("qdcm.disable_factory_mode")
-#define ENABLE_ASYNC_POWERMODE               DISPLAY_PROP("enable_async_powermode")
 #define ENABLE_GPU_TONEMAPPER_PROP           DISPLAY_PROP("enable_gpu_tonemapper")
 #define ENABLE_FORCE_SPLIT                   DISPLAY_PROP("enable_force_split")
 #define DISABLE_GPU_COLOR_CONVERT            DISPLAY_PROP("disable_gpu_color_convert")
@@ -166,6 +165,7 @@
 #define ANTI_AGING_IDLE_TIMER                DISPLAY_PROP("demura_idle_timer")
 #define ANTI_AGING_MEMORY_SIZE               DISPLAY_PROP("demura_memory_size")
 #define ANTI_AGING_RECALIB_TIMER_DIVIDER     DISPLAY_PROP("demura_recalib_timer_divider")
+#define ANTI_AGING_ENABLE_LOGGING            DISPLAY_PROP("antiaging_enable_logging")
 
 // PERF hint properties
 #define ENABLE_PERF_HINT_LARGE_COMP_CYCLE    DISPLAY_PROP("enable_perf_hint_large_comp_cycle")

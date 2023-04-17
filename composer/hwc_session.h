@@ -54,7 +54,6 @@
 #include "hwc_display.h"
 #include "hwc_display_builtin.h"
 #include "hwc_display_pluggable.h"
-#include "hwc_display_dummy.h"
 #include "hwc_display_virtual.h"
 #include "hwc_display_pluggable_test.h"
 #include "hwc_color_manager.h"
@@ -163,14 +162,6 @@ class HWCSession : hwc2_device_t, HWCUEventListener, public qClient::BnQClient,
       return HWC2_ERROR_BAD_DISPLAY;
     }
 
-    {
-      // Power state transition start.
-      SCOPE_LOCK(power_state_[display]);
-      if (power_state_transition_[display]) {
-        display = map_hwc_display_.find(display)->second;
-      }
-    }
-
     SCOPE_LOCK(locker_[display]);
     auto status = HWC2::Error::BadDisplay;
     if (hwc_display_[display]) {
@@ -185,14 +176,6 @@ class HWCSession : hwc2_device_t, HWCUEventListener, public qClient::BnQClient,
                             HWC2::Error (HWCLayer::*member)(Args...), Args... args) {
     if (display >= HWCCallbacks::kNumDisplays) {
       return HWC2_ERROR_BAD_DISPLAY;
-    }
-
-    {
-      // Power state transition start.
-      SCOPE_LOCK(power_state_[display]);
-      if (power_state_transition_[display]) {
-        display = map_hwc_display_.find(display)->second;
-      }
     }
 
     SCOPE_LOCK(locker_[display]);
@@ -359,7 +342,6 @@ class HWCSession : hwc2_device_t, HWCUEventListener, public qClient::BnQClient,
 
 
   static Locker locker_[HWCCallbacks::kNumDisplays];
-  static Locker power_state_[HWCCallbacks::kNumDisplays];
   static Locker hdr_locker_[HWCCallbacks::kNumDisplays];
   static Locker display_config_locker_;
   static std::mutex command_seq_mutex_;
@@ -450,8 +432,6 @@ class HWCSession : hwc2_device_t, HWCUEventListener, public qClient::BnQClient,
                                     uint32_t factor_out);
     virtual int UpdateVSyncSourceOnPowerModeOff();
     virtual int UpdateVSyncSourceOnPowerModeDoze();
-    virtual int SetPowerMode(uint32_t disp_id, DisplayConfig::PowerMode power_mode);
-    virtual int IsPowerModeOverrideSupported(uint32_t disp_id, bool *supported);
     virtual int IsHDRSupported(uint32_t disp_id, bool *supported);
     virtual int IsWCGSupported(uint32_t disp_id, bool *supported);
     virtual int SetLayerAsMask(uint32_t disp_id, uint64_t layer_id);
@@ -518,10 +498,8 @@ class HWCSession : hwc2_device_t, HWCUEventListener, public qClient::BnQClient,
 
   void ResetPanel();
   void InitSupportedDisplaySlots();
-  void InitSupportedNullDisplaySlots();
   int GetDisplayIndex(int dpy);
   int CreatePrimaryDisplay();
-  void CreateDummyDisplay(hwc2_display_t client_id);
   int HandleBuiltInDisplays();
   int HandlePluggableDisplays(bool delay_hotplug);
   int HandleConnectedDisplays(HWDisplaysInfo *hw_displays_info, bool delay_hotplug);
@@ -660,7 +638,6 @@ class HWCSession : hwc2_device_t, HWCUEventListener, public qClient::BnQClient,
   bool is_composer_up_ = false;
   std::mutex mutex_lum_;
   static bool pending_power_mode_[HWCCallbacks::kNumDisplays];
-  static int null_display_mode_;
   HotPlugEvent pending_hotplug_event_ = kHotPlugNone;
 
   struct VirtualDisplayData {
@@ -685,10 +662,7 @@ class HWCSession : hwc2_device_t, HWCUEventListener, public qClient::BnQClient,
   std::mutex callbacks_lock_;
   std::unordered_map<int64_t, std::shared_ptr<IDisplayConfigCallback>> callback_clients_;
   uint64_t callback_client_id_ = 0;
-  bool async_powermode_ = false;
-  bool async_power_mode_triggered_ = false;
   bool async_vds_creation_ = false;
-  bool power_state_transition_[HWCCallbacks::kNumDisplays] = {};
   std::bitset<HWCCallbacks::kNumDisplays> display_ready_;
   bool secure_session_active_ = false;
   bool is_client_up_ = false;
